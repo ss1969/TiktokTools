@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:beh="clr-namespace:Behaviors"
+             xmlns:ctrl="clr-namespace:UserControl"
+             xmlns:local="clr-namespace:TiktokTools"
+             xmlns:log="clr-namespace:LogHelper"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="TiktokTools.MainPage"
+             x:DataType="local:MainPageVM"
+             Unloaded="ContentPage_Unloaded">
+
+    <Grid Padding="20"
+          ColumnDefinitions="*, *"
+          RowDefinitions="*, *, *">
+        <!--  上左边  -->
+        <Border Grid.RowSpan="3">                                  
+            <!--
+                WidthRequest="{Binding VideoWidth}"
+                HeightRequest="{Binding VideoHeight}"
+            -->
+            <toolkit:MediaElement x:Name="mediaElement"
+                                  HorizontalOptions="CenterAndExpand"
+                                  VerticalOptions="CenterAndExpand"
+                                  MediaEnded="mediaElement_MediaEnded"
+                                  MediaFailed="mediaElement_MediaFailed"
+                                  MediaOpened="mediaElement_MediaOpened"
+                                  ShouldAutoPlay="True"
+                                  ShouldKeepScreenOn="True"
+                                  ShouldLoopPlayback="{Binding VideoLoop}"
+                                  ShouldMute="{Binding VideoMute}"
+                                  ShouldShowPlaybackControls="false"
+                                  Source="{Binding VideoSource}" />
+        </Border>
+        <!--  下左  -->
+        <Grid Grid.Row="2" Grid.Column="1">
+            <Border>
+                <ctrl:DataGrid DataSource="{Binding MediaData}" />
+            </Border>
+        </Grid>
+        <!--  上右  -->
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Border>
+                <CollectionView HeightRequest="350"
+                                ItemsSource="{Binding LogData}"
+                                ItemsUpdatingScrollMode="KeepLastItemInView"
+                                VerticalScrollBarVisibility="Always">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label log:ColorLevelBehavior.Level="{Binding Level}"
+                                   x:DataType="log:LogString"
+                                   Text="{Binding Message}" />
+                            <!--<Label x:DataType="log:LogString"
+                                   Text="{Binding Message}"
+                                   BindingContext="{Binding}">
+                                <Label.Behaviors>
+                                    <log:ColorLevelBehavior Level="{Binding Level}" />
+                                </Label.Behaviors>
+                            </Label>-->
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Border>
+        </Grid>
+        <!--  下右边  -->
+        <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+            <HorizontalStackLayout BindingContext="{x:Reference mediaElement}">
+                <Label Margin="20,20,0,0"
+                       FontAttributes="Bold"
+                       FontSize="20"
+                       Text="视频配置" />
+                <!--<Label HorizontalOptions="Center">
+                    <Label.Text>
+                        <MultiBinding StringFormat="{}Position: {0}/{1} - Current State: {2}">
+                            <Binding Path="Position" Source="{x:Reference mediaElement}" Converter="{StaticResource SecondsToStringConverter}" />
+                            <Binding Path="Duration" Source="{x:Reference mediaElement}" Converter="{StaticResource SecondsToStringConverter}" />
+                            <Binding Path="CurrentState" Source="{x:Reference mediaElement}" />
+                        </MultiBinding>
+                    </Label.Text>
+                </Label>
+                <Button HorizontalOptions="CenterAndExpand"
+                        Text="Play"
+                        Clicked="OnPlayPauseButtonClicked">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding CurrentStateProperty}"
+                                     Value="{x:Static toolkit:MediaElement}">
+                            <Setter Property="Text" Value="Pause" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding CurrentState}"
+                                     Value="{x:Static toolkit:MediaElementState.Buffering}">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button HorizontalOptions="CenterAndExpand"
+                        Text="Stop"
+                        Clicked="OnStopButtonClicked">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding CurrentState}"
+                                     Value="{x:Static toolkit:MediaElementState.Stopped}">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>-->
+            </HorizontalStackLayout>
+            <HorizontalStackLayout>
+                <!--<Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       Text="视频高度" />
+                <Entry VerticalOptions="Center" Text="{Binding VideoWidth}" />
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       Text="视频宽度" />
+                <Entry VerticalOptions="Center" Text="{Binding VideoHeight}" />
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       TextColor="LightSkyBlue"
+                       Text="还原尺寸">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding RestoreVideoSizeCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>-->
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       Text="静音" />
+                <CheckBox VerticalOptions="Center" IsChecked="{Binding VideoMute}" />
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       Text="自动循环" />
+                <CheckBox VerticalOptions="Center" IsChecked="{Binding VideoLoop}" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout>
+                <Entry WidthRequest="300"
+                       Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       Text="{Binding NetAddressEntry}" />
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       TextColor="LightSkyBlue"
+                       Text="插播网络地址">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding OpenNetAddressCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       TextColor="LightSkyBlue"
+                       Text="插播本地文件">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding OpenLocalFileCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+            <Label Margin="20,10,0,10"
+                   FontAttributes="Bold"
+                   FontSize="20"
+                   Text="配置文件" />
+            <HorizontalStackLayout>
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       TextColor="LightSkyBlue"
+                       Text="打开Config文件">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding OpenConfigFileCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       TextColor="LightSkyBlue"
+                       Text="保存Config文件">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding SaveConfigFileCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <!--<Button Text="" Command="{Binding ApplyConfigCommand}" />-->
+            </HorizontalStackLayout>
+            <Label Margin="20,10,0,0"
+                   FontAttributes="Bold"
+                   FontSize="20"
+                   Text="Log窗口" />
+            <HorizontalStackLayout>
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       TextColor="LightSkyBlue"
+                       Text="清除窗口">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding ClearLogCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       Text="只显示弹幕" />
+                <CheckBox VerticalOptions="Center" IsChecked="{Binding OnlyBarrage}" />
+                <!--<Label Margin="20,0,0,0"
+                       VerticalOptions="Center"
+                       Text="滚动到底部" />
+                <CheckBox VerticalOptions="Center" IsChecked="{Binding AutoScroll}" />-->
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>
